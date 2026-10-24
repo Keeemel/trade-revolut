@@ -12,11 +12,11 @@
 <style>
 :root{--bg:#000;--fg:#fff;--mute:#6f6f76;--card:#17181a;--red:#ff3b57;--green:#2fd16b;--pill:#ececec;--line:#26272a;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:-apple-system,"SF Pro Display",system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;touch-action:manipulation;-webkit-text-size-adjust:100%;overscroll-behavior:none}
-body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0;height:var(--h,100%);background:var(--bg);color:var(--fg);font-family:-apple-system,"SF Pro Display",system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;touch-action:manipulation;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body{position:fixed;top:0;left:0;right:0;width:100%;overflow:hidden;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 button{all:unset;cursor:pointer}
 [hidden]{display:none!important}
-.app{height:100%;height:100dvh;max-width:405.6px;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.app{height:100%;max-width:405.6px;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow:hidden}
 header{display:flex;align-items:center;justify-content:space-between;padding:15.6px 17.2px 0}
 .tabs{display:flex;gap:12.6px;font-size:clamp(19.5px,5.9vw,25px);font-weight:700;letter-spacing:-.5px}
 .tabs button{color:var(--mute)}.tabs button.on{color:var(--fg)}
@@ -30,9 +30,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:15.
 .neg{color:var(--red)}.pos{color:var(--green)}
 .ranges{display:flex;gap:clamp(14px,5.5vw,25px);padding:23.4px 18.7px 0;font-size:15.6px;font-weight:700;color:var(--mute)}
 .ranges button{padding:5.4px 0}.ranges button.on{color:var(--fg)}
-.view{flex:1;display:flex;flex-direction:column;min-height:0}
-.chart{flex:1;min-height:85.8px;position:relative;margin-top:5.4px;touch-action:none;user-select:none;-webkit-user-select:none}
-.chart.fix{flex:0 0 132.6px}
+.view{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.chart{flex:1;min-height:56px;position:relative;margin-top:5.4px;touch-action:none;user-select:none;-webkit-user-select:none}
+.chart.fix{flex:0 1 132.6px;min-height:70px}
 .chart svg{position:absolute;inset:0;width:100%;height:100%}
 .cur{position:absolute;top:0;bottom:0;width:1px;background:#8a8a90;display:none}
 .cur b{position:absolute;left:-4.5px;width:9.9px;height:9.9px;border-radius:50%;margin-top:-4.5px}
@@ -91,7 +91,9 @@ button:active{opacity:.55}
 .cash,.sheet{overscroll-behavior:contain}
 .chips{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .chips::-webkit-scrollbar{display:none}
-@media (max-height:700px){.promo{min-height:104px;padding:16px 16px 12px}.chips{display:none}}
+@media (max-height:760px){.chips{display:none}.promo{min-height:100px;padding:16px 16px 12px}}
+@media (max-height:640px){.promo{display:none}.ranges{padding-top:14px}.acc{padding-top:16px}}
+@media (max-height:500px){.fab{display:none}.spacer{height:12px}}
 </style>
 </head>
 <body>
@@ -140,15 +142,17 @@ button:active{opacity:.55}
 
 <script>
 (function(){
+function fit(){document.documentElement.style.setProperty('--h',Math.round(window.innerHeight)+'px')}
+fit();window.addEventListener('resize',fit);window.addEventListener('orientationchange',function(){setTimeout(fit,250)});window.addEventListener('pageshow',fit);
 var $=function(s){return document.querySelector(s)};
-var KEY='epargne.v6',W=520,H=300,RED='#ff3b57',GRN='#2fd16b';
+var KEY='epargne.v8',W=520,H=300,RED='#ff3b57',GRN='#2fd16b';
 function D(m,d,h){return new Date(2026,m,d,h,0,0).getTime()}
 function defTx(){
   var L=[[8,28,[10.10,10.10]],[8,30,[25.25]],[9,7,[10.10,15.15]],[9,8,[10.10]],[9,9,[10.10]],[9,12,[10.10,10.10,10.10]],[9,14,[12.12,18.18]],[9,15,[10.10,31.31]],[9,16,[35.35,16.16,18.18]],[9,19,[10.10,10.10,10.10,15.15]],[9,21,[12.12]],[9,22,[11.11]],[9,23,[10.10]],[9,24,[11.11,11.11]]],o=[];
   L.forEach(function(g){g[2].forEach(function(a,i){o.push({l:'Versement',s:'Carte bancaire',a:a,t:D(g[0],g[1],9+i*2),p:g[0]===9&&g[1]===24})})});
-  var X=[[9,1,'Lidl',23.47],[9,8,'Action',12.89],[9,10,'Carrefour Castres',31.64],[9,13,'Pizzeria',14.50],[9,17,'Aldi',27.18],[9,18,'Tacos',9.90],[9,20,'Lidl',18.36],[9,21,'Aldi',22.40],[9,22,'Carrefour Castres',36.97],[9,23,'Action',8.75]];
+  var X=[[9,1,17,'Lidl Castres',9.84],[9,2,12,'Le Fournil de Castres',3.60],[9,3,18,'Carrefour Castres',6.85],[9,5,17,'Lidl Castres',6.45],[9,7,17,'Lidl Castres',7.12],[9,8,15,'Action',9.89],[9,9,17,'Lidl Castres',5.38],[9,10,18,'Carrefour Castres',19.64],[9,11,12,'Le Fournil de Castres',5.10],[9,12,17,'Lidl Castres',8.90],[9,13,20,'Pizzeria',14.50],[9,14,18,'Carrefour Castres',4.35],[9,14,12,'Lidl Castres',4.67],[9,16,17,'Lidl Castres',6.26],[9,17,16,'Aldi',17.18],[9,18,21,'Tacos',9.90],[9,19,12,'Le Fournil de Castres',4.20],[9,19,17,'Lidl Castres',7.53],[9,21,16,'Aldi',12.40],[9,21,17,'Lidl Castres',8.15],[9,22,18,'Carrefour Castres',21.97],[9,23,15,'Action',5.75],[9,23,17,'Lidl Castres',6.43]];
   X.forEach(function(g){
-    o.push({l:g[2],s:'Paiement par carte',a:-g[3],t:D(g[0],g[1],15)});
+    o.push({l:g[3],s:'Paiement par carte',a:-g[4],t:D(g[0],g[1],g[2])});
   });
   /* 105,54 € investis : 104,15 € aujourd’hui = −1,32 % */
   o.push({l:'Vers l’épargne',s:'Virement interne',a:-105.54,t:D(9,16,18)});
@@ -335,6 +339,14 @@ sh.addEventListener('touchend',function(){if(!drag)return;drag=false;sh.style.tr
 var ax=null,ay=0;
 document.addEventListener('touchstart',function(e){ax=null;if(e.target.closest('.chart,.promo,.sheet,.ov,input,.chips'))return;ax=e.touches[0].clientX;ay=e.touches[0].clientY},{passive:true});
 document.addEventListener('touchend',function(e){if(ax===null)return;var dx=e.changedTouches[0].clientX-ax,dv=e.changedTouches[0].clientY-ay;ax=null;if(Math.abs(dx)>70&&Math.abs(dv)<45){var t=dx<0?'cash':'sav';if(S.tab!==t){S.tab=t;render()}}});
+
+
+/* ---- clavier : la feuille reste au-dessus ---- */
+if(window.visualViewport){var vv=window.visualViewport;
+  var kb=function(){var off=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);sh.style.bottom=off+'px';sh.style.maxHeight=Math.round(vv.height*.9)+'px'};
+  vv.addEventListener('resize',kb);vv.addEventListener('scroll',kb);
+}
+sh.addEventListener('focusin',function(e){var t=e.target;setTimeout(function(){if(t.scrollIntoView)t.scrollIntoView({block:'center',behavior:'smooth'})},300)});
 
 render();
 })();
